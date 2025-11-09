@@ -10,11 +10,21 @@ from elevenlabs import ElevenLabs
 from elevenlabs.play import play
 import webbrowser
 import pyautogui
+from datetime import datetime
 
 from dotenv import load_dotenv
 import os
 
 load_dotenv()
+
+import firebase_admin
+from firebase_admin import credentials, db
+cred = credentials.Certificate(os.getenv("FIREBASE_KEY_PATH"))
+firebase_admin.initialize_app(cred, {
+    "databaseURL": os.getenv("DATABASE_URL")
+})
+
+conversation_buffer = []
 
 MODEL_PATH = os.getenv("INPUT_VOICE_PATH")
 SAMPLE_RATE = 16000
@@ -89,6 +99,7 @@ def drain_text_queue():
         pass
 
 def main_loop():
+    global conversation_buffer
     buffer = []
     last_input_time = time.time()
     last_sent_prompt = None
@@ -111,24 +122,63 @@ def main_loop():
                         last_sent_prompt = None
                     else:
                         print(f"Albert Request: {prompt}")
-                        if "youtube" in prompt:
-                            print(f"BMO response: Opening YouTube in Chrome.")
-                            respond("Opening YouTube in Chrome.")
+                        if "send" == prompt:
+                            if conversation_buffer:
+                                document_id = datetime.utcnow().strftime("%d_%m_%Y-%H_%M_%S")
+                                ref = db.reference("bmo_chats")
+                                ref.child(document_id).set(conversation_buffer)
+                                respond("Conversation sent to database, sir.")
+                                print(f"BMO response: Conversation sent to Firebase: {document_id}")
+                                conversation_buffer = []
+                            else:
+                                bmo_response = "BMO response: Sorry Sir, No conversation to send yet."
+                                respond("Sorry Sir, No conversation to send yet.")
+
+                        elif "hello" in prompt:
+                            bmo_response = "BMO response: Yes Sir."
+                            print("BMO response: Yes Sir.")
+                            respond("Yes Sir.")
+
+                        elif "youtube" in prompt:
+                            bmo_response = "BMO response: Opening YouTube in Chrome."
+                            print("BMO response: Opening YouTube in Chrome.")
+                            respond("Yes Sir, Opening YouTube in Chrome.")
                             webbrowser.get("chrome").open("https://www.youtube.com")
 
                         elif "what's up" in prompt:
-                            print(f"BMO response: Opening WhatsApp.")
-                            respond("Opening WhatsApp.")
+                            bmo_response = "BMO response: Opening WhatsApp."
+                            print("BMO response: Opening WhatsApp.")
+                            respond("Yes Sir, Opening WhatsApp.")
                             pyautogui.hotkey('win', '2')
+
+                        elif "business account" in prompt:
+                            bmo_response = "BMO response: Opening Linkedin."
+                            print("BMO response: Opening Linkedin.")
+                            respond("Yes Sir, Opening Linkedin.")
+                            webbrowser.get("chrome").open("https://www.linkedin.com/in/albertaugustine1884/")
 
                         else:
                             response = local_bmo_inference(prompt)
-                            print(f"BMO response: {response}")
-                            respond(response)
+                            bmo_response = f"BMO response: Yes sir, {response}"
+                            print(f"BMO response: Yes sir, {response}")
+                            respond(f"Yes sir, {response}")
                         print("\n")
                         last_sent_prompt = prompt
                         drain_text_queue()
                         last_sent_prompt = None
+                        exchange = {
+                            "albert": {
+                                "message": f"Albert Request: {prompt}",
+                                "timestamp": datetime.utcnow().strftime("%H:%M:%S")
+                            },
+                            "bmo": {
+                                "message": bmo_response,
+                                "timestamp": datetime.utcnow().strftime("%H:%M:%S")
+                            }
+                        }
+
+                        conversation_buffer.append(exchange)
+
             time.sleep(0.1)
         except KeyboardInterrupt:
             break
