@@ -139,7 +139,7 @@ def main_loop():
                             print("BMO response: Yes Sir.")
                             respond("Yes Sir.")
 
-                        elif "youtube" in prompt:
+                        elif prompt == "watch":
                             bmo_response = "BMO response: Opening YouTube in Chrome."
                             print("BMO response: Opening YouTube in Chrome.")
                             respond("Yes Sir, Opening YouTube in Chrome.")
@@ -156,6 +156,12 @@ def main_loop():
                             print("BMO response: Opening Linkedin.")
                             respond("Yes Sir, Opening Linkedin.")
                             webbrowser.get("chrome").open("https://www.linkedin.com/in/albertaugustine1884/")
+
+                        elif "code" == prompt:
+                            bmo_response = "BMO response: Opening VS Code."
+                            print("BMO response: Opening VS Code.")
+                            respond("Yes Sir, Opening VS Code.")
+                            pyautogui.hotkey('win', '3')
 
                         else:
                             response = local_bmo_inference(prompt)

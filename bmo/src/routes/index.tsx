@@ -4,7 +4,7 @@ import Counter from "~/components/Counter";
 export default function Home() {
   return (
     <main>
-      <Title>Hello World</Title>
+      <Title>BMO</Title>
       <h1>Hello world!</h1>
       <Counter />
       <p>

@@ -9,10 +9,23 @@ export default function App() {
     <Router
       root={props => (
         <MetaProvider>
-          <Title>SolidStart - Basic</Title>
-          <a href="/">Index</a>
-          <a href="/about">About</a>
-          <Suspense>{props.children}</Suspense>
+          <Title>Personal Laptop AI Assistant</Title>
+          <nav class="navbar">
+            <div class="navbar-container">
+              <div class="navbar-brand">
+                <a href="/" class="brand-link">
+                  <img src="/bmo.png" alt="Logo" class="logo-image" />
+                </a>
+              </div>
+              <div class="navbar-menu">
+                <a href="/" class="nav-link">Main</a>
+                <a href="/about" class="nav-link">Chats</a>
+              </div>
+            </div>
+          </nav>
+          <main class="main-content">
+            <Suspense>{props.children}</Suspense>
+          </main>
         </MetaProvider>
       )}
     >
