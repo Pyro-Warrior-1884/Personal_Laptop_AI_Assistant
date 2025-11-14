@@ -1,3 +1,5 @@
+import "./ContributionsSection.css"
+
 export default function ContributionsSection() {
   return (
     <div class="section-text">

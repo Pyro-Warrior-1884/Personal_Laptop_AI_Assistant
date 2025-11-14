@@ -1,3 +1,5 @@
+import "./ChatSectionExplanationSection.css"
+
 export default function ChatSectionExplanationSection() {
   return (
     <div class="section-text">

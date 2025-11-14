@@ -1,0 +1,30 @@
+/* sections.css */
+.section-text-intro {
+    flex: 1;
+}
+
+.section-title-intro {
+    font-size: 1.875rem;
+    font-weight: 700;
+    background: linear-gradient(90deg, #93c5fd 0%, #67e8f9 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 16px;
+}
+
+.section-paragraph-intro {
+    color: #d1d5db;
+    line-height: 1.75;
+    font-size: 1.125rem;
+}
+
+@media (max-width: 768px) {
+    .section-title-intro {
+        font-size: 1.5rem;
+    }
+
+    .section-paragraph-intro {
+        font-size: 1rem;
+    }
+}

@@ -1,3 +1,5 @@
+import "./OllamaLLMSection.css"
+
 export default function OllamaLLMSection() {
   return (
     <div class="section-text">

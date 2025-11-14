@@ -1,4 +1,4 @@
-
+/* index.css */
 * {
     margin: 0;
     padding: 0;
@@ -173,26 +173,6 @@ body {
     box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3);
 }
 
-.section-text {
-    flex: 1;
-}
-
-.section-title {
-    font-size: 1.875rem;
-    font-weight: 700;
-    background: linear-gradient(90deg, #93c5fd 0%, #67e8f9 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 16px;
-}
-
-.section-paragraph {
-    color: #d1d5db;
-    line-height: 1.75;
-    font-size: 1.125rem;
-}
-
 .footer {
     border-top: 1px solid #1f2937;
     margin-top: 80px;
@@ -208,42 +188,34 @@ body {
 
 @keyframes fade-in {
     from {
-    opacity: 0;
-    transform: translateY(20px);
+        opacity: 0;
+        transform: translateY(20px);
     }
     to {
-    opacity: 1;
-    transform: translateY(0);
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
 @media (max-width: 768px) {
     .hero-title {
-    font-size: 2.5rem;
+        font-size: 2.5rem;
     }
 
     .hero-subtitle {
-    font-size: 1rem;
+        font-size: 1rem;
     }
 
     .hero-badges {
-    flex-direction: column;
-    align-items: center;
+        flex-direction: column;
+        align-items: center;
     }
 
     .nav-dots {
-    display: none;
+        display: none;
     }
 
     .section-content {
-    flex-direction: column;
-    }
-
-    .section-title {
-    font-size: 1.5rem;
-    }
-
-    .section-paragraph {
-    font-size: 1rem;
+        flex-direction: column;
     }
 }

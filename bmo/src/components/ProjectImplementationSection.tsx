@@ -1,3 +1,5 @@
+import "./ProjectImplementationSection.css"
+
 export default function ProjectImplementationSection() {
   return (
     <div class="section-text">

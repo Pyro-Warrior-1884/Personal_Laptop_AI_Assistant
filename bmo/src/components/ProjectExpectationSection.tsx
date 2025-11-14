@@ -1,3 +1,5 @@
+import "./ProjectExpectationSection.css"
+
 export default function ProjectExpectationSection() {
   return (
     <div class="section-text">
