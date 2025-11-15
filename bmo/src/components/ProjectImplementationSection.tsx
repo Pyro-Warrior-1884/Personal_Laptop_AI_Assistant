@@ -4,8 +4,26 @@ export default function ProjectImplementationSection() {
   return (
     <div class="section-text">
       <h2 class="section-title">Project Implementation</h2>
+
       <p class="section-paragraph">
-        BMO's architecture follows a modern client-server model with a SolidJS frontend communicating with a FastAPI backend. The implementation emphasizes modularity, allowing easy integration of different language models and preprocessing pipelines. State management is handled efficiently on the frontend, while the backend processes requests asynchronously, managing model inference and response generation. The system is designed with scalability in mind, supporting concurrent users and maintaining conversation contexts.
+        The AI Assistant is powered by a locally hosted language model optimized
+        for on-device performance. The system processes voice input, converts it
+        into text, generates intelligent responses, and outputs audio replies
+        in real time.
+      </p>
+      <br></br>
+      <p class="section-paragraph">
+        The core logic is built using a Python-based backend designed for
+        automation, enabling the assistant to interact with applications,
+        execute system-level actions, and handle various user commands
+        seamlessly.
+      </p>
+      <br></br>
+      <p class="section-paragraph">
+        A dedicated speech pipeline manages continuous listening, speech
+        recognition, and response generation. The output audio is produced
+        through an integrated text-to-speech layer, ensuring natural and clear
+        communication with the user.
       </p>
     </div>
   );
