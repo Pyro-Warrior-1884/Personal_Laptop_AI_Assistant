@@ -19,7 +19,7 @@ export default function App() {
               </div>
               <div class="navbar-menu">
                 <a href="/" class="nav-link">Main</a>
-                <a href="/about" class="nav-link">Chats</a>
+                <a href="/chats" class="nav-link">Chats</a>
               </div>
             </div>
           </nav>
