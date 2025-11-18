@@ -57,7 +57,7 @@ export default function PasswordPage() {
       return;
     }
 
-    if (pwd !== '1884') {
+    if (pwd !== process.env.VITE_PASSWORD) {
       showError('Wrong password. Please try again');
       return;
     }
