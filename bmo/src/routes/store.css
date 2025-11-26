@@ -1,24 +1,90 @@
 .store-page {
     min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    padding: 40px 20px;
     background: linear-gradient(135deg, #0a1628 0%, #0d2847 50%, #1a3a5c 100%);
     color: white;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-.store-content {
-    text-align: center;
+.store-container {
+    max-width: 1300px;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 32px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
-.store-title {
-    font-size: 48px;
-    font-weight: 700;
-    margin-bottom: 16px;
+.tab-navigation {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 32px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 0;
 }
 
-.store-subtitle {
-    font-size: 20px;
+.tab-button {
+    background: transparent;
+    border: none;
     color: #93c5fd;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 12px 24px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    border-radius: 8px 8px 0 0;
+}
+
+.tab-button:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+}
+
+.tab-button.active {
+    background: rgba(147, 197, 253, 0.1);
+    color: white;
+}
+
+.tab-button.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #93c5fd;
+}
+
+.tab-content {
+    min-height: 400px;
+}
+
+.view-container {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.view-title {
+    font-size: 28px;
+    font-weight: 600;
+    margin: 0 0 16px 0;
+    color: white;
+}
+
+.view-description {
+    font-size: 16px;
+    color: #93c5fd;
+    margin: 0;
 }

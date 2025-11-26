@@ -140,7 +140,7 @@ def main_loop():
                             if conversation_buffer:
                                 document = {
                                     "conversation": conversation_buffer,
-                                    "created_at": datetime.utcnow()
+                                    "created_at": datetime.utcnow().strftime("%d-%m-%Y %H:%M:%S")
                                 }
                                 try:
                                     result = bmo_collection.insert_one(document)
