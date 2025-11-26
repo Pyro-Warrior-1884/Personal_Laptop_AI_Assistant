@@ -17,12 +17,24 @@ import os
 
 load_dotenv()
 
-import firebase_admin
-from firebase_admin import credentials, db
-cred = credentials.Certificate(os.getenv("FIREBASE_KEY_PATH"))
-firebase_admin.initialize_app(cred, {
-    "databaseURL": os.getenv("DATABASE_URL")
-})
+from pymongo import MongoClient
+
+MONGO_URI = os.getenv("MONGO_URI")
+if not MONGO_URI:
+    print("Error: MONGO_URI is not set in .env")
+    sys.exit(1)
+
+try:
+    mongo_client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
+    mongo_client.admin.command("ping")
+    mongo_db = mongo_client.get_default_database()
+    if mongo_db is not None:
+        mongo_db = mongo_client["BMO"]  
+    bmo_collection = mongo_db["chat"]
+    print("Connected to MongoDB Atlas.")
+except Exception as e:
+    print("Error connecting to MongoDB Atlas:", e)
+    sys.exit(1)
 
 conversation_buffer = []
 
@@ -31,7 +43,8 @@ SAMPLE_RATE = 16000
 DEVICE = None
 
 chrome_path = os.getenv("CHROME_PATH")
-webbrowser.register('chrome', None, webbrowser.BackgroundBrowser(chrome_path))
+if chrome_path:
+    webbrowser.register('chrome', None, webbrowser.BackgroundBrowser(chrome_path))
 
 try:
     model = vosk.Model(MODEL_PATH)
@@ -99,6 +112,7 @@ def drain_text_queue():
         pass
 
 def main_loop():
+    respond("BMO Active.")
     global conversation_buffer
     buffer = []
     last_input_time = time.time()
@@ -122,14 +136,22 @@ def main_loop():
                         last_sent_prompt = None
                     else:
                         print(f"Albert Request: {prompt}")
-                        if "send" == prompt:
+                        if "up" == prompt:
                             if conversation_buffer:
-                                document_id = datetime.utcnow().strftime("%d_%m_%Y-%H_%M_%S")
-                                ref = db.reference("bmo_chats")
-                                ref.child(document_id).set(conversation_buffer)
-                                respond("Conversation sent to database, sir.")
-                                print(f"BMO response: Conversation sent to Firebase: {document_id}")
-                                conversation_buffer = []
+                                document = {
+                                    "conversation": conversation_buffer,
+                                    "created_at": datetime.utcnow()
+                                }
+                                try:
+                                    result = bmo_collection.insert_one(document)
+                                    inserted_id = str(result.inserted_id)
+                                    respond("Conversation sent to database, sir.")
+                                    print(f"BMO response: Conversation sent to MongoDB: {inserted_id}")
+                                    conversation_buffer = []
+                                except Exception as e:
+                                    print("MongoDB insert error:", e)
+                                    respond("Sorry Sir, I couldn't save the conversation to MongoDB.")
+                                
                             else:
                                 bmo_response = "BMO response: Sorry Sir, No conversation to send yet."
                                 respond("Sorry Sir, No conversation to send yet.")
@@ -175,11 +197,11 @@ def main_loop():
                         exchange = {
                             "albert": {
                                 "message": f"Albert Request: {prompt}",
-                                "timestamp": datetime.utcnow().strftime("%H:%M:%S")
+                                "timestamp": datetime.utcnow().strftime("%d-%m-%Y %H:%M:%S")
                             },
                             "bmo": {
                                 "message": bmo_response,
-                                "timestamp": datetime.utcnow().strftime("%H:%M:%S")
+                                "timestamp": datetime.utcnow().strftime("%d-%m-%Y %H:%M:%S")
                             }
                         }
 
