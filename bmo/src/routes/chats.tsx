@@ -71,7 +71,7 @@ export default function PasswordPage() {
         when={isAuthenticated()}
         fallback={
           <main class="password-page">
-            <Title>Enter Password</Title>
+            <Title>Authentication</Title>
             <div class="password-container">
               <div class="password-card">
                 <div class="header">

@@ -11,7 +11,7 @@ export default function Store() {
 
   return (
     <div class="store-page">
-      <Title>Store</Title>
+      <Title>Assistant</Title>
       
       <div class="store-container">
         <div class="tab-navigation">
@@ -19,7 +19,7 @@ export default function Store() {
             class={`tab-button ${activeTab() === "current" ? "active" : ""}`}
             onClick={() => setActiveTab("current")}
           >
-            Current
+            Latest
           </button>
           <button
             class={`tab-button ${activeTab() === "history" ? "active" : ""}`}
