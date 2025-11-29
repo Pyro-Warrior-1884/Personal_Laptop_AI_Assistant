@@ -1,4 +1,6 @@
-import { createSignal, createMemo } from "solid-js";
+import { createSignal, createMemo, createResource } from "solid-js";
+import { client } from "../graphql/client"; // your Apollo client
+import { GET_HISTORY } from "../graphql/queries";
 
 function parseCustomDate(dateTimeStr) {
   const [datePart, timePart] = dateTimeStr.split(" ");
@@ -7,51 +9,36 @@ function parseCustomDate(dateTimeStr) {
   return new Date(year, month - 1, day, hours, minutes);
 }
 
+async function fetchHistory() {
+  const res = await client.query({
+    query: GET_HISTORY,
+    fetchPolicy: "no-cache"
+  });
+
+  // convert backend format → frontend format
+  return res.data.getHistory.map((entry, index) => ({
+    id: index + 1,
+    dateTime: entry.timestamp,
+    userRequest: entry.user_response,
+    bmoResponse: entry.bmo_response
+  }));
+}
 
 export default function HistoryView() {
-  const initialData = [
-    {
-      id: 1,
-      dateTime: "27-11-2025 14:30",
-      userRequest: "Show me the latest sales report",
-      bmoResponse: "Here's the Q4 sales report with a 15% increase in revenue",
-    },
-    {
-      id: 2,
-      dateTime: "26-11-2025 13:15",
-      userRequest: "Generate invoice for client ABC",
-      bmoResponse: "Invoice #INV-2024-001 has been generated successfully",
-    },
-    {
-      id: 3,
-      dateTime: "25-11-2025 11:45",
-      userRequest: "Update customer database",
-      bmoResponse: "Customer records updated with 50 new entries",
-    },
-    {
-      id: 4,
-      dateTime: "27-11-2025 16:20",
-      userRequest: "Analyze market trends",
-      bmoResponse: "Market analysis shows positive growth in tech sector",
-    },
-    {
-      id: 5,
-      dateTime: "26-11-2025 10:00",
-      userRequest: "Schedule team meeting",
-      bmoResponse: "Meeting scheduled for November 28 at 3:00 PM",
-    },
-  ];
+  const [historyData] = createResource(fetchHistory);
 
   const [sortOrder, setSortOrder] = createSignal("desc");
   const [dateFilter, setDateFilter] = createSignal("");
 
   const filteredAndSortedData = createMemo(() => {
-    let data = [...initialData];
+    if (!historyData()) return [];
+
+    let data = [...historyData()];
 
     if (dateFilter()) {
       const [year, month, day] = dateFilter().split("-");
       const formatted = `${day}-${month}-${year}`;
-      
+
       data = data.filter((item) =>
         item.dateTime.startsWith(formatted)
       );
@@ -65,6 +52,7 @@ export default function HistoryView() {
 
     return data;
   });
+
 
 
   const toggleSortOrder = () => {

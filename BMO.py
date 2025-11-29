@@ -23,6 +23,8 @@ MONGO_URI = os.getenv("MONGO_URI")
 if not MONGO_URI:
     print("Error: MONGO_URI is not set in .env")
     sys.exit(1)
+    
+global_record_id = 1
 
 try:
     mongo_client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
@@ -138,21 +140,33 @@ def main_loop():
                         print(f"Albert Request: {prompt}")
                         if "up" == prompt:
                             if conversation_buffer:
-                                document = {
-                                    "conversation": conversation_buffer,
-                                    "created_at": datetime.utcnow().strftime("%d-%m-%Y %H:%M:%S")
-                                }
                                 try:
-                                    result = bmo_collection.insert_one(document)
-                                    inserted_id = str(result.inserted_id)
+                                    global global_record_id
+
+                                    for exchange in conversation_buffer:
+
+                                        record = {
+                                            "id": global_record_id,
+                                            "user_response": exchange["albert"]["message"],
+                                            "bmo_response": exchange["bmo"]["message"],
+                                            "timestamp": exchange["bmo"]["timestamp"]
+                                        }
+
+                                        bmo_collection.insert_one(record)
+                                        global_record_id += 1
+
                                     respond("Conversation sent to database, sir.")
-                                    print(f"BMO response: Conversation sent to MongoDB: {inserted_id}")
+                                    print("BMO response: Conversation records sent to MongoDB.")
+
                                     conversation_buffer = []
+
                                 except Exception as e:
                                     print("MongoDB insert error:", e)
                                     respond("Sorry Sir, I couldn't save the conversation to MongoDB.")
-                                
+
                             else:
+                                
+
                                 bmo_response = "BMO response: Sorry Sir, No conversation to send yet."
                                 respond("Sorry Sir, No conversation to send yet.")
 
@@ -196,8 +210,7 @@ def main_loop():
                         last_sent_prompt = None
                         exchange = {
                             "albert": {
-                                "message": f"Albert Request: {prompt}",
-                                "timestamp": datetime.utcnow().strftime("%d-%m-%Y %H:%M:%S")
+                                "message": f"Albert Request: {prompt}"
                             },
                             "bmo": {
                                 "message": bmo_response,
