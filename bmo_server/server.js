@@ -8,6 +8,11 @@ const history = [
     bmo_response: "BMO response: Yes Sir.",
   },
   {
+    timestamp: "29-11-2025 15:23:00",
+    user_response: "Albert Request: hello",
+    bmo_response: "BMO response: Yes Sir.",
+  },
+  {
     timestamp: "29-11-2025 15:24:10",
     user_response: "Albert Request: open youtube",
     bmo_response: "BMO response: Opening YouTube.",
@@ -57,7 +62,11 @@ const typeDefs = `
 
 const resolvers = {
   Query: {
-    getHistory: () => history,
+    getHistory: () => history.map((h) => ({
+      timestamp: h.timestamp,
+      user_response: null,
+      bmo_response: null
+    })),
 
     getHistoryByTimestamp: (parent, args) => {
       return history.find((entry) => entry.timestamp === args.timestamp);
