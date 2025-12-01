@@ -1,6 +1,6 @@
 import { createSignal, createMemo } from "solid-js";
 import { client } from "../graphql/client";
-import { GET_HISTORY, GET_HISTORY_BY_TIMESTAMP } from "../graphql/queries";
+import { EDIT_ENTRY, DELETE_ENTRY ,GET_HISTORY, GET_HISTORY_BY_TIMESTAMP } from "../graphql/queries";
 
 export function parseCustomDate(dateTimeStr: string) {
   const [datePart, timePart] = dateTimeStr.split(" ");
@@ -98,12 +98,77 @@ export function useHistoryController() {
     }
   };
 
-  const handleEdit = (timestamp) => {
-    console.log("Edit row with timestamp:", timestamp);
+  const handleEdit = async (timestamp) => {
+    try {
+      // Example: fetch existing data to show in UI (optional)
+      const existing = expandedRows().get(timestamp);
+
+      const user_response = prompt(
+        "Edit User Request:",
+        existing?.userRequest || ""
+      );
+      const bmo_response = prompt(
+        "Edit BMO Response:",
+        existing?.bmoResponse || ""
+      );
+
+      const res = await client.mutate({
+        mutation: EDIT_ENTRY,
+        variables: {
+          timestamp,
+          user_response,
+          bmo_response
+        },
+        fetchPolicy: "no-cache"
+      });
+
+      // Update UI
+      setExpandedRows((prev) => {
+        const map = new Map(prev);
+        map.set(timestamp, {
+          userRequest: res.data.editEntry.user_response,
+          bmoResponse: res.data.editEntry.bmo_response
+        });
+        return map;
+      });
+
+      alert("Entry updated successfully!");
+    } catch (err) {
+      console.error("Edit error:", err);
+      alert("Failed to edit entry.");
+    }
   };
 
-  const handleDelete = (timestamp) => {
-    console.log("Delete row with timestamp:", timestamp);
+  const handleDelete = async (timestamp) => {
+    try {
+      const confirmDelete = confirm("Are you sure you want to delete this entry?");
+      if (!confirmDelete) return;
+
+      const res = await client.mutate({
+        mutation: DELETE_ENTRY,
+        variables: { timestamp },
+        fetchPolicy: "no-cache"
+      });
+
+      if (res.data.deleteEntry) {
+        // Remove from timestamps list
+        setTimestamps((prev) => prev.filter((t) => t.timestamp !== timestamp));
+
+        // Remove from expanded rows
+        setExpandedRows((prev) => {
+          const map = new Map(prev);
+          map.delete(timestamp);
+          return map;
+        });
+
+        alert("Entry deleted successfully!");
+      } else {
+        alert("Failed to delete entry.");
+      }
+    } catch (err) {
+      console.error("Delete error:", err);
+      alert("Delete failed.");
+    }
   };
 
   return {    
