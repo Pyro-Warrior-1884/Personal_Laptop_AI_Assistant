@@ -1,4 +1,4 @@
-import { createSignal, createMemo } from "solid-js";
+import { createSignal, createMemo, createEffect } from "solid-js";
 import { client } from "../graphql/client";
 import { EDIT_ENTRY, DELETE_ENTRY ,GET_HISTORY, GET_HISTORY_BY_TIMESTAMP } from "../graphql/queries";
 
@@ -16,6 +16,12 @@ export function useHistoryController() {
   const [sortOrder, setSortOrder] = createSignal("desc");
   const [dateFilter, setDateFilter] = createSignal("");
   const [isInitialLoading, setIsInitialLoading] = createSignal(true);
+  const [editingRow, setEditingRow] = createSignal(null);
+  const [editFormData, setEditFormData] = createSignal({
+    userRequest: "",
+    bmoResponse: ""
+  });
+  const [isSaving, setIsSaving] = createSignal(false);
 
   const loadInitialTimestamps = async () => {
     try {
@@ -98,52 +104,40 @@ export function useHistoryController() {
     }
   };
 
-  const handleEdit = async (timestamp) => {
-    try {
-      // Example: fetch existing data to show in UI (optional)
-      const existing = expandedRows().get(timestamp);
-
-      const user_response = prompt(
-        "Edit User Request:",
-        existing?.userRequest || ""
-      );
-      const bmo_response = prompt(
-        "Edit BMO Response:",
-        existing?.bmoResponse || ""
-      );
-
+  const handleEdit = async (timestamp, userResponse, bmoResponse) => {
+    try {      
       const res = await client.mutate({
         mutation: EDIT_ENTRY,
         variables: {
           timestamp,
-          user_response,
-          bmo_response
+          user_response: userResponse,
+          bmo_response: bmoResponse
         },
         fetchPolicy: "no-cache"
       });
 
-      // Update UI
-      setExpandedRows((prev) => {
-        const map = new Map(prev);
-        map.set(timestamp, {
-          userRequest: res.data.editEntry.user_response,
-          bmoResponse: res.data.editEntry.bmo_response
+      if (res.data && res.data.editEntry) {
+        setExpandedRows((prev) => {
+          const map = new Map(prev);
+          map.set(timestamp, {
+            userRequest: res.data.editEntry.user_response,
+            bmoResponse: res.data.editEntry.bmo_response
+          });
+          return map;
         });
-        return map;
-      });
 
-      alert("Entry updated successfully!");
+        return true;
+      } else {
+        throw new Error("Failed to update entry");
+      }
     } catch (err) {
       console.error("Edit error:", err);
-      alert("Failed to edit entry.");
+      throw err;
     }
   };
 
   const handleDelete = async (timestamp) => {
     try {
-      const confirmDelete = confirm("Are you sure you want to delete this entry?");
-      if (!confirmDelete) return;
-
       const res = await client.mutate({
         mutation: DELETE_ENTRY,
         variables: { timestamp },
@@ -151,43 +145,95 @@ export function useHistoryController() {
       });
 
       if (res.data.deleteEntry) {
-        // Remove from timestamps list
         setTimestamps((prev) => prev.filter((t) => t.timestamp !== timestamp));
 
-        // Remove from expanded rows
         setExpandedRows((prev) => {
           const map = new Map(prev);
           map.delete(timestamp);
           return map;
         });
 
-        alert("Entry deleted successfully!");
+        return true;
       } else {
-        alert("Failed to delete entry.");
+        throw new Error("Failed to delete entry");
       }
     } catch (err) {
       console.error("Delete error:", err);
-      alert("Delete failed.");
+      throw err;
     }
   };
 
-  return {    
-    timestamps,
+  createEffect(() => {
+    loadInitialTimestamps();
+  });
+
+  const openEditModal = (timestamp) => {
+    const rowData = expandedRows().get(timestamp);
+    if (!rowData) return;
+
+    setEditFormData({
+      userRequest: rowData.userRequest || "",
+      bmoResponse: rowData.bmoResponse || ""
+    });
+
+    setEditingRow(timestamp);
+  };
+
+  const closeEditModal = () => {
+    setEditingRow(null);
+    setEditFormData({ userRequest: "", bmoResponse: "" });
+  };
+
+  const saveEdit = async () => {
+    const timestamp = editingRow();
+    if (!timestamp) return;
+
+    setIsSaving(true);
+    try {
+      await handleEdit(
+        timestamp,
+        editFormData().userRequest,
+        editFormData().bmoResponse
+      );
+
+      closeEditModal();
+    } catch (err) {
+      console.error("Error saving edit:", err);
+      throw err;
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const confirmDelete = async (timestamp) => {
+    try {
+      await handleDelete(timestamp);
+    } catch (err) {
+      console.error("Error deleting entry:", err);
+      throw err;
+    }
+  };
+
+  return {
     expandedRows,
     loadingRows,
     sortOrder,
     dateFilter,
     isInitialLoading,
-
     setDateFilter,
-    setSortOrder,
-
-    loadInitialTimestamps,
     filteredAndSortedData,
     toggleSortOrder,
-    fetchRowDetails,
     handleRowClick,
-    handleEdit,
-    handleDelete
+    handleEdit, 
+    handleDelete,
+
+    editingRow,
+    editFormData,
+    isSaving,
+    setEditFormData,
+    openEditModal,
+    closeEditModal,
+    saveEdit,
+    confirmDelete
   };
 }
