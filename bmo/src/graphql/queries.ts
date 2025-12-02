@@ -41,3 +41,13 @@ export const DELETE_ENTRY = gql`
     deleteEntry(timestamp: $timestamp)
   }
 `;
+
+export const GET_LATEST_ENTRY = gql`
+  query {
+    getLatestEntry {
+      timestamp
+      user_response
+      bmo_response
+    }
+  }
+`;

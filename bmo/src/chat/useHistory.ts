@@ -1,6 +1,12 @@
 import { createSignal, createMemo, createEffect } from "solid-js";
 import { client } from "../graphql/client";
-import { EDIT_ENTRY, DELETE_ENTRY ,GET_HISTORY, GET_HISTORY_BY_TIMESTAMP } from "../graphql/queries";
+import { 
+  EDIT_ENTRY, 
+  DELETE_ENTRY,
+  GET_HISTORY, 
+  GET_HISTORY_BY_TIMESTAMP,
+  GET_LATEST_ENTRY 
+} from "../graphql/queries";
 
 export function parseCustomDate(dateTimeStr: string) {
   const [datePart, timePart] = dateTimeStr.split(" ");
@@ -40,6 +46,26 @@ export function useHistoryController() {
       console.error("Error fetching timestamps:", error);
     } finally {
       setIsInitialLoading(false);
+    }
+  };
+
+  const loadLatestEntry = async () => {
+    try {
+      const res = await client.query({
+        query: GET_LATEST_ENTRY,
+        fetchPolicy: "no-cache"
+      });
+
+      if (!res.data || !res.data.getLatestEntry) return null;
+
+      return {
+        request: res.data.getLatestEntry.user_response,
+        response: res.data.getLatestEntry.bmo_response,
+        datetime: res.data.getLatestEntry.timestamp
+      };
+    } catch (err) {
+      console.error("Error loading latest:", err);
+      return null;
     }
   };
 
@@ -234,6 +260,8 @@ export function useHistoryController() {
     openEditModal,
     closeEditModal,
     saveEdit,
-    confirmDelete
+    confirmDelete,
+
+    loadLatestEntry
   };
 }

@@ -32,13 +32,25 @@ const history = [
     user_response: "Albert Request: shutdown system",
     bmo_response: "BMO response: Cannot do that without permission.",
   },
+  {
+    timestamp: "29-11-2025 15:25:40",
+    user_response: "Albert Request: shutdown system",
+    bmo_response: "BMO response: Cannot do that without permission.",
+  },
 ];
 
+const parseDate = (ts) => {
+  const [d, t] = ts.split(" ");
+  const [day, month, year] = d.split("-").map(Number);
+  const [h, m, s] = t.split(":").map(Number);
+  return new Date(year, month - 1, day, h, m, s);
+};
 
 const typeDefs = `
     type Query {
         getHistory: [History]
         getHistoryByTimestamp(timestamp: String!): History
+        getLatestEntry: History
     }
 
     type Mutation {
@@ -62,21 +74,28 @@ const typeDefs = `
 
 const resolvers = {
   Query: {
-    getHistory: () => history.map((h) => ({
-      timestamp: h.timestamp,
-      user_response: null,
-      bmo_response: null
-    })),
+    getHistory: () =>
+      history.map((h) => ({
+        timestamp: h.timestamp,
+        user_response: null,
+        bmo_response: null,
+      })),
 
     getHistoryByTimestamp: (parent, args) => {
       return history.find((entry) => entry.timestamp === args.timestamp);
+    },
+
+    getLatestEntry: () => {
+      if (history.length === 0) return null;
+      return history
+        .slice()
+        .sort((a, b) => parseDate(b.timestamp) - parseDate(a.timestamp))[0];
     },
   },
 
   Mutation: {
     editEntry: (parent, args) => {
       const { timestamp, user_response, bmo_response } = args;
-
       const entry = history.find((h) => h.timestamp === timestamp);
       if (!entry) return null;
 
@@ -90,7 +109,6 @@ const resolvers = {
       const index = history.findIndex(
         (entry) => entry.timestamp === args.timestamp
       );
-
       if (index === -1) return false;
 
       history.splice(index, 1);
