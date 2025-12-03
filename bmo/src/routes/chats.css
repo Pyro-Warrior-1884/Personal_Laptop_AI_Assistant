@@ -189,7 +189,7 @@ background: linear-gradient(to right, #2563eb, #3b82f6);
 color: white;
 font-weight: 600;
 font-size: 16px;
-border: none;
+border: 1px solid #000eae;
 border-radius: 8px;
 cursor: pointer;
 transition: all 0.2s ease;
@@ -214,4 +214,94 @@ transition: color 0.2s ease;
 
 .forgot-link:hover {
 color: #93c5fd;
+}
+
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-in;
+}
+
+.modal-content {
+  background: linear-gradient(to right, #2563eb, #3b82f6);
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  animation: slideUp 0.3s ease-out;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.cancel-btn {
+  flex: 1;
+  padding: 10px 16px;
+  border: 1px solid #ae0000;
+  background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+  color: #374151;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cancel-btn:hover {
+  background: linear-gradient(to right, #f63b3b, #fa8960);
+box-shadow: 0 10px 25px -5px rgba(246, 59, 59, 0.5);
+  transform: translateY(-1px);
+}
+
+.modal-buttons .submit-btn {
+  flex: 1;
+  margin: 0;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }

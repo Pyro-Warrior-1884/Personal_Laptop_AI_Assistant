@@ -9,6 +9,8 @@ export default function PasswordPage() {
   const [error, setError] = createSignal('');
   const [isAuthenticated, setIsAuthenticated] = createSignal(false);
   const [isFadingOut, setIsFadingOut] = createSignal(false);
+  const [showEmailModal, setShowEmailModal] = createSignal(false);
+  const [email, setEmail] = createSignal('');
   let errorTimeout;
   let fadeTimeout;
 
@@ -65,6 +67,36 @@ export default function PasswordPage() {
     setIsAuthenticated(true);
   };
 
+  const handleForgotPassword = (e) => {
+    e.preventDefault();
+    setShowEmailModal(true);
+  };
+
+  const handleEmailSubmit = (e) => {
+    e.preventDefault();
+    const emailValue = email().trim();
+    
+    if (emailValue === '') {
+      showError('Please enter an email address');
+      return;
+    }
+    
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue)) {
+      showError('Please enter a valid email address');
+      return;
+    }
+    
+    console.log('Password request sent to:', emailValue);
+    showError('Password request sent successfully!');
+    setShowEmailModal(false);
+    setEmail('');
+  };
+
+  const closeModal = () => {
+    setShowEmailModal(false);
+    setEmail('');
+  };
+
   return (
     <>
       <Show
@@ -119,7 +151,7 @@ export default function PasswordPage() {
                     Continue
                   </button>
 
-                  <a href="#" class="forgot-link">
+                  <a href="#" class="forgot-link" onClick={handleForgotPassword}>
                     Send request for the password?
                   </a>
                 </form>
@@ -128,6 +160,37 @@ export default function PasswordPage() {
               <Show when={error()}>
                 <div class={`error-message ${isFadingOut() ? 'fade-out' : ''}`}>
                   {error()}
+                </div>
+              </Show>
+
+              <Show when={showEmailModal()}>
+                <div class="modal-overlay" onClick={closeModal}>
+                  <div class="modal-content" onClick={(e) => e.stopPropagation()}>
+                    <div class="modal-header">
+                      <h3>Request Password</h3>
+                    </div>
+                    <form onSubmit={handleEmailSubmit}>
+                      <div class="input-group">
+                        <label class="label">Email Address</label>
+                        <input
+                          type="email"
+                          value={email()}
+                          onInput={(e) => setEmail(e.currentTarget.value)}
+                          placeholder="Enter Email"
+                          class="password-input"
+                          autofocus
+                        />
+                      </div>
+                      <div class="modal-buttons">
+                        <button type="button" onClick={closeModal} class="cancel-btn">
+                          Cancel
+                        </button>
+                        <button type="submit" class="submit-btn">
+                          Send Request
+                        </button>
+                      </div>
+                    </form>
+                  </div>
                 </div>
               </Show>
             </div>
