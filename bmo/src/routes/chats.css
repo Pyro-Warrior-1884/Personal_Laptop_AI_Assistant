@@ -37,7 +37,7 @@ animation: slideInBounce 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 opacity: 1;
 transition: opacity 1s ease-out;
 border-left: 4px solid rgba(255, 255, 255, 0.3);
-backdrop-filter: blur(10px);
+backdrop-filter: blur(5px);
 display: flex;
 align-items: center;
 gap: 12px;
@@ -216,8 +216,6 @@ transition: color 0.2s ease;
 color: #93c5fd;
 }
 
-
-/* Modal Styles */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -277,7 +275,7 @@ color: #93c5fd;
 
 .cancel-btn:hover {
   background: linear-gradient(to right, #f63b3b, #fa8960);
-box-shadow: 0 10px 25px -5px rgba(246, 59, 59, 0.5);
+  box-shadow: 0 10px 25px -5px rgba(246, 59, 59, 0.5);
   transform: translateY(-1px);
 }
 
@@ -303,5 +301,47 @@ box-shadow: 0 10px 25px -5px rgba(246, 59, 59, 0.5);
   to {
     transform: translateY(0);
     opacity: 1;
+  }
+}
+
+.success-message {
+  position: absolute;
+  left: calc(50% + 250px);
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  color: white;
+  padding: 18px 24px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  min-width: 280px;
+  max-width: 350px;
+  box-shadow: 0 20px 40px -10px rgba(5, 150, 105, 0.5),
+              0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+  animation: slideInBounce 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  opacity: 1;
+  transition: opacity 1s ease-out;
+  border-left: 4px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.success-message::before {
+  content: '✓';
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.success-message.fade-out {
+  opacity: 0;
+}
+
+@media (max-width: 768px) {
+  .success-message {
+    position: static;
+    width: 100%;
+    max-width: 450px;
+    margin-top: 16px;
   }
 }

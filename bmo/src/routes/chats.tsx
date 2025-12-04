@@ -1,37 +1,45 @@
 import { Title } from "@solidjs/meta";
 import { createSignal, Show } from "solid-js";
 import Store from "./store";
-import "./chats.css"
+import { sendEmailRequest } from "./emailreq";
+import "./chats.css";
 
 export default function PasswordPage() {
   const [password, setPassword] = createSignal('');
   const [showPassword, setShowPassword] = createSignal(false);
   const [error, setError] = createSignal('');
+  const [success, setSuccess] = createSignal('');
   const [isAuthenticated, setIsAuthenticated] = createSignal(false);
   const [isFadingOut, setIsFadingOut] = createSignal(false);
+  const [isSuccessFadingOut, setIsSuccessFadingOut] = createSignal(false);
   const [showEmailModal, setShowEmailModal] = createSignal(false);
   const [email, setEmail] = createSignal('');
   let errorTimeout;
   let fadeTimeout;
+  let successTimeout;
+  let successFadeTimeout;
 
   const showError = (message) => {
     setError(message);
     setIsFadingOut(false);
-    
-    if (errorTimeout) {
-      clearTimeout(errorTimeout);
-    }
-    if (fadeTimeout) {
-      clearTimeout(fadeTimeout);
-    }
-    
-    fadeTimeout = setTimeout(() => {
-      setIsFadingOut(true);
-    }, 9000);
-    
+    if (errorTimeout) clearTimeout(errorTimeout);
+    if (fadeTimeout) clearTimeout(fadeTimeout);
+    fadeTimeout = setTimeout(() => setIsFadingOut(true), 9000);
     errorTimeout = setTimeout(() => {
       setError('');
       setIsFadingOut(false);
+    }, 10000);
+  };
+
+  const showSuccess = (message) => {
+    setSuccess(message);
+    setIsSuccessFadingOut(false);
+    if (successTimeout) clearTimeout(successTimeout);
+    if (successFadeTimeout) clearTimeout(successFadeTimeout);
+    successFadeTimeout = setTimeout(() => setIsSuccessFadingOut(true), 9000);
+    successTimeout = setTimeout(() => {
+      setSuccess('');
+      setIsSuccessFadingOut(false);
     }, 10000);
   };
 
@@ -41,29 +49,19 @@ export default function PasswordPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
-    if (errorTimeout) {
-      clearTimeout(errorTimeout);
-    }
-    if (fadeTimeout) {
-      clearTimeout(fadeTimeout);
-    }
-    
+    if (errorTimeout) clearTimeout(errorTimeout);
+    if (fadeTimeout) clearTimeout(fadeTimeout);
     setError('');
     setIsFadingOut(false);
-
     const pwd = password().trim();
-
     if (pwd === '') {
       showError('Please enter a password');
       return;
     }
-
     if (pwd !== import.meta.env.VITE_PASSWORD) {
       showError('Wrong password. Please try again');
       return;
     }
-
     setIsAuthenticated(true);
   };
 
@@ -72,22 +70,26 @@ export default function PasswordPage() {
     setShowEmailModal(true);
   };
 
-  const handleEmailSubmit = (e) => {
+  const handleEmailSubmit = async (e) => {
     e.preventDefault();
     const emailValue = email().trim();
-    
     if (emailValue === '') {
       showError('Please enter an email address');
       return;
     }
-    
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue)) {
       showError('Please enter a valid email address');
       return;
     }
-    
-    console.log('Password request sent to:', emailValue);
-    showError('Password request sent successfully!');
+
+    const result = await sendEmailRequest(emailValue);
+
+    if (result?.success) {
+      showSuccess('Password request sent successfully!');
+    } else {
+      showError(result?.error || 'Failed to send request');
+    }
+
     setShowEmailModal(false);
     setEmail('');
   };
@@ -156,10 +158,16 @@ export default function PasswordPage() {
                   </a>
                 </form>
               </div>
-              
+
               <Show when={error()}>
                 <div class={`error-message ${isFadingOut() ? 'fade-out' : ''}`}>
                   {error()}
+                </div>
+              </Show>
+
+              <Show when={success()}>
+                <div class={`success-message ${isSuccessFadingOut() ? 'fade-out' : ''}`}>
+                  {success()}
                 </div>
               </Show>
 
