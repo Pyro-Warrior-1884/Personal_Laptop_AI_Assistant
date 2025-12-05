@@ -501,7 +501,7 @@
 }
 
 /* Modal Overlay */
-.modal-overlay {
+.modal-overlay-edit {
     position: fixed;
     top: 0;
     left: 0;
@@ -527,7 +527,7 @@
 }
 
 /* Modal Content */
-.modal-content {
+.modal-content-edit {
     background: linear-gradient(135deg, #0d2847 0%, #1a3a5c 100%);
     border-radius: 16px;
     max-width: 650px;
@@ -550,7 +550,7 @@
 }
 
 /* Modal Header */
-.modal-header {
+.modal-header-edit {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -559,14 +559,14 @@
     background: rgba(147, 197, 253, 0.05);
 }
 
-.modal-header h3 {
+.modal-header-edit h3 {
     margin: 0;
     font-size: 1.5rem;
     color: white;
     font-weight: 600;
 }
 
-.modal-close-btn {
+.modal-close-btn-edit {
     background: rgba(248, 113, 113, 0.1);
     border: 1px solid rgba(248, 113, 113, 0.3);
     cursor: pointer;
@@ -579,34 +579,34 @@
     justify-content: center;
 }
 
-.modal-close-btn:hover {
+.modal-close-btn-edit:hover {
     background: rgba(248, 113, 113, 0.2);
     border-color: rgba(248, 113, 113, 0.5);
     transform: rotate(90deg);
 }
 
 /* Modal Body */
-.modal-body {
+.modal-body-edit {
     padding: 2rem;
     max-height: 60vh;
     overflow-y: auto;
 }
 
-.modal-body::-webkit-scrollbar {
+.modal-body-edit::-webkit-scrollbar {
     width: 8px;
 }
 
-.modal-body::-webkit-scrollbar-track {
+.modal-body-edit::-webkit-scrollbar-track {
     background: rgba(147, 197, 253, 0.05);
     border-radius: 4px;
 }
 
-.modal-body::-webkit-scrollbar-thumb {
+.modal-body-edit::-webkit-scrollbar-thumb {
     background: rgba(147, 197, 253, 0.3);
     border-radius: 4px;
 }
 
-.modal-body::-webkit-scrollbar-thumb:hover {
+.modal-body-edit::-webkit-scrollbar-thumb:hover {
     background: rgba(147, 197, 253, 0.5);
 }
 
@@ -654,7 +654,7 @@
 }
 
 /* Modal Footer */
-.modal-footer {
+.modal-footer-edit {
     display: flex;
     gap: 1rem;
     justify-content: flex-end;
@@ -760,18 +760,18 @@
         font-size: 24px;
     }
 
-    .modal-content {
+    .modal-content-edit {
         margin: 1rem;
         max-width: 100%;
     }
 
-    .modal-header,
-    .modal-body,
-    .modal-footer {
+    .modal-header-edit,
+    .modal-body-edit,
+    .modal-footer-edit {
         padding: 1rem 1.5rem;
     }
 
-    .modal-header h3 {
+    .modal-header-edit h3 {
         font-size: 1.25rem;
     }
 

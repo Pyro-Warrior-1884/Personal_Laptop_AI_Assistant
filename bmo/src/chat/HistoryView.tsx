@@ -199,11 +199,11 @@ export default function HistoryView() {
       </div>
 
       <Show when={editingRow()}>
-        <div class="modal-overlay" onClick={closeEditModal}>
-          <div class="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div class="modal-header">
+        <div class="modal-overlay-edit" onClick={closeEditModal}>
+          <div class="modal-content-edit" onClick={(e) => e.stopPropagation()}>
+            <div class="modal-header-edit">
               <h3>Edit Entry</h3>
-              <button class="modal-close-btn" onClick={closeEditModal}>
+              <button class="modal-close-btn-edit" onClick={closeEditModal}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <line x1="18" y1="6" x2="6" y2="18" />
                   <line x1="6" y1="6" x2="18" y2="18" />
@@ -211,7 +211,7 @@ export default function HistoryView() {
               </button>
             </div>
 
-            <div class="modal-body">
+            <div class="modal-body-edit">
               <div class="form-group">
                 <label class="form-label">User Request</label>
                 <textarea
@@ -245,7 +245,7 @@ export default function HistoryView() {
               </div>
             </div>
 
-            <div class="modal-footer">
+            <div class="modal-footer-edit">
               <button class="btn btn-secondary" onClick={closeEditModal} disabled={isSaving()}>
                 Cancel
               </button>
