@@ -12,6 +12,8 @@
   "type": "module",
   "dependencies": {
     "@apollo/server": "^5.2.0",
+    "@sendgrid/mail": "^8.1.6",
+    "dotenv": "^17.2.3",
     "graphql": "^16.12.0"
   }
 }

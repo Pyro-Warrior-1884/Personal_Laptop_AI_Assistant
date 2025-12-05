@@ -85,20 +85,29 @@ const resolvers = {
 
     sendEmail: async (_, args) => {
       try {
+        const password = process.env.PASSWORD;
+
         const msg = {
           to: args.email,
-          from: { email: process.env.FROM_EMAIL, name: process.env.FROM_NAME },
-          subject: "Password Reset",
-          text: "This is your hardcoded message.",
-          html: "<p>This is your <strong>hardcoded</strong> message.</p>"
+          from: { 
+            email: process.env.FROM_EMAIL, 
+            name: process.env.FROM_NAME 
+          },
+          subject: "Password Request",
+          text: `Thank you for viewing my application, here is the password: ${password}`,
+          html: `<p>Thank you for viewing my application,<br><br>
+                Here is the password: <strong>${password}</strong></p>`
         };
 
         await sgMail.send(msg);
         return true;
-      } catch {
+
+      } catch (err) {
+        console.error("Email error:", err);
         return false;
       }
     }
+
   }
 };
 
