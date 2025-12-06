@@ -2,19 +2,11 @@ import { ApolloServer } from "@apollo/server";
 import { startStandaloneServer } from "@apollo/server/standalone";
 import sgMail from "@sendgrid/mail";
 import dotenv from "dotenv";
+import mongoose from "mongoose";
+import History from "./History.js";
 
 dotenv.config();
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-
-const history = [
-  { timestamp: "28-11-2025 15:23:50", user_response: "Albert Request: hello", bmo_response: "BMO response: Yes Sir." },
-  { timestamp: "27-11-2025 15:23:00", user_response: "Albert Request: hello", bmo_response: "BMO response: Yes Sir." },
-  { timestamp: "26-11-2025 15:24:10", user_response: "Albert Request: open youtube", bmo_response: "BMO response: Opening YouTube." },
-  { timestamp: "26-11-2025 15:24:35", user_response: "Albert Request: what's the time", bmo_response: "BMO response: It's 3:24 PM." },
-  { timestamp: "27-11-2025 15:25:00", user_response: "Albert Request: play some music", bmo_response: "BMO response: Playing your playlist." },
-  { timestamp: "28-11-2025 15:25:20", user_response: "Albert Request: shutdown system", bmo_response: "BMO response: Cannot do that without permission." },
-  { timestamp: "29-11-2025 15:25:40", user_response: "Albert Request: shutdown system", bmo_response: "BMO response: Cannot do that without permission." }
-];
 
 const parseDate = (ts) => {
   const [d, t] = ts.split(" ");
@@ -45,42 +37,43 @@ const typeDefs = `
 
 const resolvers = {
   Query: {
-    getHistory: () =>
-      history.map((h) => ({
-        timestamp: h.timestamp,
-        user_response: null,
-        bmo_response: null
-      })),
+    getHistory: async () => {
+      const docs = await History.find().lean();
+      docs.sort((a, b) => parseDate(b.timestamp) - parseDate(a.timestamp));
+      return docs;
+    },
 
-    getHistoryByTimestamp: (_, args) =>
-      history.find((entry) => entry.timestamp === args.timestamp),
+    getHistoryByTimestamp: async (_, args) => {
+      return History.findOne({ timestamp: args.timestamp }).lean();
+    },
 
-    getLatestEntry: () => {
-      if (history.length === 0) return null;
-      return history
-        .slice()
-        .sort((a, b) => parseDate(b.timestamp) - parseDate(a.timestamp))[0];
+    getLatestEntry: async () => {
+      const docs = await History.find().lean();
+      if (!docs.length) return null;
+      docs.sort((a, b) => parseDate(b.timestamp) - parseDate(a.timestamp));
+      return docs[0];
     }
   },
 
   Mutation: {
-    editEntry: (_, args) => {
+    editEntry: async (_, args) => {
       const { timestamp, user_response, bmo_response } = args;
-      const entry = history.find((h) => h.timestamp === timestamp);
-      if (!entry) return null;
 
-      if (user_response !== undefined) entry.user_response = user_response;
-      if (bmo_response !== undefined) entry.bmo_response = bmo_response;
-
-      return entry;
+      return History.findOneAndUpdate(
+        { timestamp },
+        {
+          $set: {
+            ...(user_response !== undefined ? { user_response } : {}),
+            ...(bmo_response !== undefined ? { bmo_response } : {})
+          }
+        },
+        { new: true }
+      ).lean();
     },
 
-    deleteEntry: (_, args) => {
-      const index = history.findIndex((entry) => entry.timestamp === args.timestamp);
-      if (index === -1) return false;
-
-      history.splice(index, 1);
-      return true;
+    deleteEntry: async (_, args) => {
+      const res = await History.deleteOne({ timestamp: args.timestamp });
+      return res.deletedCount > 0;
     },
 
     sendEmail: async (_, args) => {
@@ -89,27 +82,26 @@ const resolvers = {
 
         const msg = {
           to: args.email,
-          from: { 
-            email: process.env.FROM_EMAIL, 
-            name: process.env.FROM_NAME 
+          from: {
+            email: process.env.FROM_EMAIL,
+            name: process.env.FROM_NAME
           },
           subject: "Password Request",
           text: `Thank you for viewing my application, here is the password: ${password}`,
           html: `<p>Thank you for viewing my application,<br><br>
-                Here is the password: <strong>${password}</strong></p>`
+                 Here is the password: <strong>${password}</strong></p>`
         };
 
         await sgMail.send(msg);
         return true;
-
-      } catch (err) {
-        console.error("Email error:", err);
+      } catch {
         return false;
       }
     }
-
   }
 };
+
+await mongoose.connect(process.env.MONGO_URI);
 
 const server = new ApolloServer({ typeDefs, resolvers });
 

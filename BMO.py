@@ -199,6 +199,11 @@ def main_loop():
                             respond("Yes Sir, Opening VS Code.")
                             pyautogui.hotkey('win', '3')
 
+                        elif "stop" == prompt:
+                            print("BMO response: Thank You Sir, Until we meet again.")
+                            respond("Thank You Sir, Until we meet again.")
+                            sys.exit(0)
+
                         else:
                             response = local_bmo_inference(prompt)
                             bmo_response = f"BMO response: Yes sir, {response}"
