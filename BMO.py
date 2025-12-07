@@ -165,8 +165,6 @@ def main_loop():
                                     respond("Sorry Sir, I couldn't save the conversation to MongoDB.")
 
                             else:
-                                
-
                                 bmo_response = "BMO response: Sorry Sir, No conversation to send yet."
                                 respond("Sorry Sir, No conversation to send yet.")
 

@@ -1,0 +1,6 @@
+sounddevice
+vosk
+elevenlabs
+pyautogui
+python-dotenv
+pymongo
