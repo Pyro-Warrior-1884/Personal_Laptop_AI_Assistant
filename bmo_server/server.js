@@ -101,12 +101,15 @@ const resolvers = {
   }
 };
 
+const PORT = process.env.PORT || 4000;
+
 await mongoose.connect(process.env.MONGO_URI);
 
 const server = new ApolloServer({ typeDefs, resolvers });
 
 const { url } = await startStandaloneServer(server, {
-  listen: { port: 4000 }
+  listen: { port: PORT },
+  cors: { origin: "*" }
 });
 
 console.log(`Server running at: ${url}`);
