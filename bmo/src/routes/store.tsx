@@ -3,9 +3,10 @@ import { createSignal, onMount } from "solid-js";
 import "./store.css";
 import CurrentView from "../chat/CurrentView";
 import HistoryView from "../chat/HistoryView";
+import CustomCommands from "../chat/CustomCommands"; 
 import { useHistoryController } from "../chat/useHistory";
 
-type Tab = "current" | "history";
+type Tab = "current" | "history" | "commands"; 
 
 export default function Store() {
   const [activeTab, setActiveTab] = createSignal<Tab>("current");
@@ -46,13 +47,22 @@ export default function Store() {
           >
             History
           </button>
+
+          <button
+            class={`tab-button ${activeTab() === "commands" ? "active" : ""}`}
+            onClick={() => switchTab("commands")}
+          >
+            Custom Commands
+          </button>
         </div>
 
         <div class="tab-content">
           {activeTab() === "current" ? (
             <CurrentView latest={latest()} />
-          ) : (
+          ) : activeTab() === "history" ? (
             <HistoryView />
+          ) : (
+            <CustomCommands /> 
           )}
         </div>
       </div>

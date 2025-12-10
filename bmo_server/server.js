@@ -3,7 +3,9 @@ import { startStandaloneServer } from "@apollo/server/standalone";
 import sgMail from "@sendgrid/mail";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
+
 import History from "./History.js";
+import CustomCommand from "./CustomCommand.js";
 
 dotenv.config();
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
@@ -16,22 +18,36 @@ const parseDate = (ts) => {
 };
 
 const typeDefs = `
+  type History {
+    timestamp: String
+    user_response: String
+    bmo_response: String
+  }
+
+  type CustomCommand {
+    timestamp: String
+    user_response: String
+    bmo_response: String
+  }
+
   type Query {
     getHistory: [History]
     getHistoryByTimestamp(timestamp: String!): History
     getLatestEntry: History
+
+    getCommands: [CustomCommand]
+    getCommandByTimestamp(timestamp: String!): CustomCommand
   }
 
   type Mutation {
     editEntry(timestamp: String!, user_response: String, bmo_response: String): History
     deleteEntry(timestamp: String!): Boolean
-    sendEmail(email: String!): Boolean
-  }
 
-  type History {
-    timestamp: String
-    user_response: String
-    bmo_response: String
+    addCommand(timestamp: String!, user_response: String, bmo_response: String): CustomCommand
+    editCommand(timestamp: String!, user_response: String, bmo_response: String): CustomCommand
+    deleteCommand(timestamp: String!): Boolean
+
+    sendEmail(email: String!): Boolean
   }
 `;
 
@@ -42,16 +58,23 @@ const resolvers = {
       docs.sort((a, b) => parseDate(b.timestamp) - parseDate(a.timestamp));
       return docs;
     },
-
     getHistoryByTimestamp: async (_, args) => {
       return History.findOne({ timestamp: args.timestamp }).lean();
     },
-
     getLatestEntry: async () => {
       const docs = await History.find().lean();
       if (!docs.length) return null;
       docs.sort((a, b) => parseDate(b.timestamp) - parseDate(a.timestamp));
       return docs[0];
+    },
+
+    getCommands: async () => {
+      const docs = await CustomCommand.find().lean();
+      docs.sort((a, b) => parseDate(b.timestamp) - parseDate(a.timestamp));
+      return docs;
+    },
+    getCommandByTimestamp: async (_, args) => {
+      return CustomCommand.findOne({ timestamp: args.timestamp }).lean();
     }
   },
 
@@ -76,6 +99,30 @@ const resolvers = {
       return res.deletedCount > 0;
     },
 
+    addCommand: async (_, args) => {
+      return CustomCommand.create(args);
+    },
+
+    editCommand: async (_, args) => {
+      const { timestamp, user_response, bmo_response } = args;
+
+      return CustomCommand.findOneAndUpdate(
+        { timestamp },
+        {
+          $set: {
+            ...(user_response !== undefined ? { user_response } : {}),
+            ...(bmo_response !== undefined ? { bmo_response } : {})
+          }
+        },
+        { new: true }
+      ).lean();
+    },
+
+    deleteCommand: async (_, args) => {
+      const res = await CustomCommand.deleteOne({ timestamp: args.timestamp });
+      return res.deletedCount > 0;
+    },
+
     sendEmail: async (_, args) => {
       try {
         const password = process.env.PASSWORD;
@@ -87,9 +134,8 @@ const resolvers = {
             name: process.env.FROM_NAME
           },
           subject: "Password Request",
-          text: `Thank you for viewing my application, here is the password: ${password}`,
-          html: `<p>Thank you for viewing my application,<br><br>
-                 Here is the password: <strong>${password}</strong></p>`
+          text: `Here is the password: ${password}`,
+          html: `<p>Here is the password: <strong>${password}</strong></p>`
         };
 
         await sgMail.send(msg);
