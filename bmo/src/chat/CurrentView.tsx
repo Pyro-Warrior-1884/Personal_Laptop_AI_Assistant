@@ -1,9 +1,5 @@
-import { createResource } from "solid-js";
-import { useHistoryController } from "./useHistory";
-
-export default function CurrentView() {
-  const { loadLatestEntry } = useHistoryController();
-  const [latest] = createResource(loadLatestEntry);
+export default function CurrentView(props) {
+  const latest = () => props.latest;
 
   return (
     <div class="view-container">
