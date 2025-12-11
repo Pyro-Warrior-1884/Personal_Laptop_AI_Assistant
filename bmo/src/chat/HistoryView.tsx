@@ -68,7 +68,7 @@ export default function HistoryView() {
           fallback={
             <div class="loading-state">
               <div class="spinner"></div>
-              <p>Loading history...</p>
+              <p>Loading History...</p>
             </div>
           }
         >

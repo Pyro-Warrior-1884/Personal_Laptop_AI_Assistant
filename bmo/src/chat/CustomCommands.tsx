@@ -1,5 +1,5 @@
-import { For, Show, createSignal } from "solid-js";
-import { useHistoryController } from "./useHistory";
+import { For, Show} from "solid-js";
+import { useCustomCommandsController } from "./useCustomCommandsController";
 
 export default function CustomCommands() {
   const {
@@ -19,54 +19,22 @@ export default function CustomCommands() {
     editingRow,
     editFormData,
     isSaving,
-    setEditFormData
-  } = useHistoryController();
+    setEditFormData,
 
-  const [showAddModal, setShowAddModal] = createSignal(false);
-  const [addFormData, setAddFormData] = createSignal({
-    userRequest: "",
-    bmoResponse: ""
-  });
-  const [isAdding, setIsAdding] = createSignal(false);
+    showAddModal,
+    addFormData,
+    setAddFormData,
+    openAddModal,
+    closeAddModal,
+    saveNewEntry,
+    isAdding
+  } = useCustomCommandsController();
 
-  const openAddModal = () => {
-    setAddFormData({ userRequest: "", bmoResponse: "" });
-    setShowAddModal(true);
-  };
-
-  const closeAddModal = () => {
-    setShowAddModal(false);
-    setAddFormData({ userRequest: "", bmoResponse: "" });
-  };
-
-  const saveNewEntry = async () => {
-    if (!addFormData().userRequest.trim() || !addFormData().bmoResponse.trim()) {
-      alert("Both fields are required");
-      return;
-    }
-
-    setIsAdding(true);
-    try {
-      // Add your save logic here
-      // For now, we'll just simulate a delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // TODO: Add the actual save logic to persist the new entry
-      console.log("New entry:", addFormData());
-      
-      closeAddModal();
-    } catch (error) {
-      console.error("Error adding entry:", error);
-      alert("Failed to add entry");
-    } finally {
-      setIsAdding(false);
-    }
-  };
 
   return (
     <div class="custom-container">
       <div class="custom-header">
-        <h2 class="custom-title">Interaction History</h2>
+        <h2 class="custom-title">Custom Commands</h2>
         <div class="custom-controls">
           <div class="custom-date-filter-wrapper">
             <input
@@ -86,6 +54,7 @@ export default function CustomCommands() {
               </button>
             </Show>
           </div>
+
           <button
             class="custom-sort-btn"
             onClick={toggleSortOrder}
@@ -100,11 +69,8 @@ export default function CustomCommands() {
             </svg>
             <span>{sortOrder() === "asc" ? "Oldest First" : "Newest First"}</span>
           </button>
-          <button
-            class="custom-add-btn"
-            onClick={openAddModal}
-            title="Add new entry"
-          >
+
+          <button class="custom-add-btn" onClick={openAddModal} title="Add new entry">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <line x1="12" y1="5" x2="12" y2="19" />
               <line x1="5" y1="12" x2="19" y2="12" />
@@ -120,7 +86,7 @@ export default function CustomCommands() {
           fallback={
             <div class="custom-loading-state">
               <div class="custom-spinner"></div>
-              <p>Loading history...</p>
+              <p>Loading Custom Commands...</p>
             </div>
           }
         >
@@ -151,7 +117,7 @@ export default function CustomCommands() {
                     return (
                       <tr class="custom-table-row" classList={{ expanded: isExpanded() }}>
                         <td class="custom-table-cell custom-datetime-cell">{item.timestamp}</td>
-                        
+
                         <td
                           class="custom-table-cell custom-request-cell custom-clickable-cell"
                           classList={{ expanded: isExpanded(), loading: isLoading() }}
@@ -182,7 +148,7 @@ export default function CustomCommands() {
                             </Show>
                           </Show>
                         </td>
-                        
+
                         <td
                           class="custom-table-cell custom-response-cell custom-clickable-cell"
                           classList={{ expanded: isExpanded(), loading: isLoading() }}
@@ -213,7 +179,7 @@ export default function CustomCommands() {
                             </Show>
                           </Show>
                         </td>
-                        
+
                         <td class="custom-table-cell custom-actions-cell">
                           <button
                             class="custom-action-btn custom-edit-btn"
@@ -227,6 +193,7 @@ export default function CustomCommands() {
                               <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                             </svg>
                           </button>
+
                           <button
                             class="custom-action-btn custom-delete-btn"
                             onClick={() => confirmDelete(item.timestamp)}
@@ -276,7 +243,6 @@ export default function CustomCommands() {
                     }))
                   }
                   rows="4"
-                  placeholder="Enter user request..."
                 />
               </div>
 
@@ -292,7 +258,6 @@ export default function CustomCommands() {
                     }))
                   }
                   rows="4"
-                  placeholder="Enter BMO response..."
                 />
               </div>
             </div>
@@ -338,7 +303,6 @@ export default function CustomCommands() {
                     }))
                   }
                   rows="4"
-                  placeholder="Enter user request..."
                 />
               </div>
 
@@ -354,7 +318,6 @@ export default function CustomCommands() {
                     }))
                   }
                   rows="4"
-                  placeholder="Enter BMO response..."
                 />
               </div>
             </div>
