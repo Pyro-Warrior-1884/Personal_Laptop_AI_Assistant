@@ -22,22 +22,63 @@ export default function CustomCommands() {
     setEditFormData
   } = useHistoryController();
 
+  const [showAddModal, setShowAddModal] = createSignal(false);
+  const [addFormData, setAddFormData] = createSignal({
+    userRequest: "",
+    bmoResponse: ""
+  });
+  const [isAdding, setIsAdding] = createSignal(false);
+
+  const openAddModal = () => {
+    setAddFormData({ userRequest: "", bmoResponse: "" });
+    setShowAddModal(true);
+  };
+
+  const closeAddModal = () => {
+    setShowAddModal(false);
+    setAddFormData({ userRequest: "", bmoResponse: "" });
+  };
+
+  const saveNewEntry = async () => {
+    if (!addFormData().userRequest.trim() || !addFormData().bmoResponse.trim()) {
+      alert("Both fields are required");
+      return;
+    }
+
+    setIsAdding(true);
+    try {
+      // Add your save logic here
+      // For now, we'll just simulate a delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // TODO: Add the actual save logic to persist the new entry
+      console.log("New entry:", addFormData());
+      
+      closeAddModal();
+    } catch (error) {
+      console.error("Error adding entry:", error);
+      alert("Failed to add entry");
+    } finally {
+      setIsAdding(false);
+    }
+  };
+
   return (
-    <div class="history-container">
-      <div class="history-header">
-        <h2 class="history-title">Interaction History</h2>
-        <div class="history-controls">
-          <div class="date-filter-wrapper">
+    <div class="custom-container">
+      <div class="custom-header">
+        <h2 class="custom-title">Interaction History</h2>
+        <div class="custom-controls">
+          <div class="custom-date-filter-wrapper">
             <input
               type="date"
-              class="date-filter-input"
+              class="custom-date-filter-input"
               value={dateFilter()}
               onInput={(e) => setDateFilter(e.target.value)}
               placeholder="Filter by date"
             />
             <Show when={dateFilter()}>
               <button
-                class="clear-filter-btn"
+                class="custom-clear-filter-btn"
                 onClick={() => setDateFilter("")}
                 title="Clear filter"
               >
@@ -46,7 +87,7 @@ export default function CustomCommands() {
             </Show>
           </div>
           <button
-            class="sort-btn"
+            class="custom-sort-btn"
             onClick={toggleSortOrder}
             title={`Sort ${sortOrder() === "asc" ? "descending" : "ascending"}`}
           >
@@ -59,15 +100,26 @@ export default function CustomCommands() {
             </svg>
             <span>{sortOrder() === "asc" ? "Oldest First" : "Newest First"}</span>
           </button>
+          <button
+            class="custom-add-btn"
+            onClick={openAddModal}
+            title="Add new entry"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            <span>Add Entry</span>
+          </button>
         </div>
       </div>
 
-      <div class="history-table-wrapper">
+      <div class="custom-table-wrapper">
         <Show
           when={!isInitialLoading()}
           fallback={
-            <div class="loading-state">
-              <div class="spinner"></div>
+            <div class="custom-loading-state">
+              <div class="custom-spinner"></div>
               <p>Loading history...</p>
             </div>
           }
@@ -75,18 +127,18 @@ export default function CustomCommands() {
           <Show
             when={filteredAndSortedData().length > 0}
             fallback={
-              <div class="no-results">
+              <div class="custom-no-results">
                 <p>No records found for the selected date.</p>
               </div>
             }
           >
-            <table class="history-table">
+            <table class="custom-table">
               <thead>
                 <tr>
-                  <th class="table-header">Date & Time</th>
-                  <th class="table-header">User Request</th>
-                  <th class="table-header">BMO Response</th>
-                  <th class="table-header">Actions</th>
+                  <th class="custom-table-header">Date & Time</th>
+                  <th class="custom-table-header">User Request</th>
+                  <th class="custom-table-header">BMO Response</th>
+                  <th class="custom-table-header">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -97,19 +149,19 @@ export default function CustomCommands() {
                     const isExpanded = () => expandedRows().has(item.timestamp);
 
                     return (
-                      <tr class="table-row" classList={{ expanded: isExpanded() }}>
-                        <td class="table-cell datetime-cell">{item.timestamp}</td>
+                      <tr class="custom-table-row" classList={{ expanded: isExpanded() }}>
+                        <td class="custom-table-cell custom-datetime-cell">{item.timestamp}</td>
                         
                         <td
-                          class="table-cell request-cell clickable-cell"
+                          class="custom-table-cell custom-request-cell custom-clickable-cell"
                           classList={{ expanded: isExpanded(), loading: isLoading() }}
                           onClick={() => handleRowClick(item.timestamp)}
                         >
                           <Show
                             when={!isLoading()}
                             fallback={
-                              <div class="cell-loading">
-                                <div class="mini-spinner"></div>
+                              <div class="custom-cell-loading">
+                                <div class="custom-mini-spinner"></div>
                                 <span>Loading...</span>
                               </div>
                             }
@@ -117,7 +169,7 @@ export default function CustomCommands() {
                             <Show
                               when={isExpanded()}
                               fallback={
-                                <div class="hidden-content">
+                                <div class="custom-hidden-content">
                                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                                     <circle cx="12" cy="12" r="3" />
@@ -132,15 +184,15 @@ export default function CustomCommands() {
                         </td>
                         
                         <td
-                          class="table-cell response-cell clickable-cell"
+                          class="custom-table-cell custom-response-cell custom-clickable-cell"
                           classList={{ expanded: isExpanded(), loading: isLoading() }}
                           onClick={() => handleRowClick(item.timestamp)}
                         >
                           <Show
                             when={!isLoading()}
                             fallback={
-                              <div class="cell-loading">
-                                <div class="mini-spinner"></div>
+                              <div class="custom-cell-loading">
+                                <div class="custom-mini-spinner"></div>
                                 <span>Loading...</span>
                               </div>
                             }
@@ -148,7 +200,7 @@ export default function CustomCommands() {
                             <Show
                               when={isExpanded()}
                               fallback={
-                                <div class="hidden-content">
+                                <div class="custom-hidden-content">
                                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                                     <circle cx="12" cy="12" r="3" />
@@ -162,9 +214,9 @@ export default function CustomCommands() {
                           </Show>
                         </td>
                         
-                        <td class="table-cell actions-cell">
+                        <td class="custom-table-cell custom-actions-cell">
                           <button
-                            class="action-btn edit-btn"
+                            class="custom-action-btn custom-edit-btn"
                             classList={{ disabled: !isExpanded() }}
                             onClick={() => isExpanded() && openEditModal(item.timestamp)}
                             disabled={!isExpanded()}
@@ -176,7 +228,7 @@ export default function CustomCommands() {
                             </svg>
                           </button>
                           <button
-                            class="action-btn delete-btn"
+                            class="custom-action-btn custom-delete-btn"
                             onClick={() => confirmDelete(item.timestamp)}
                             title="Delete"
                           >
@@ -198,12 +250,13 @@ export default function CustomCommands() {
         </Show>
       </div>
 
+      {/* Edit Modal */}
       <Show when={editingRow()}>
-        <div class="modal-overlay-edit" onClick={closeEditModal}>
-          <div class="modal-content-edit" onClick={(e) => e.stopPropagation()}>
-            <div class="modal-header-edit">
+        <div class="custom-modal-overlay-edit" onClick={closeEditModal}>
+          <div class="custom-modal-content-edit" onClick={(e) => e.stopPropagation()}>
+            <div class="custom-modal-header-edit">
               <h3>Edit Entry</h3>
-              <button class="modal-close-btn-edit" onClick={closeEditModal}>
+              <button class="custom-modal-close-btn-edit" onClick={closeEditModal}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <line x1="18" y1="6" x2="6" y2="18" />
                   <line x1="6" y1="6" x2="18" y2="18" />
@@ -211,11 +264,11 @@ export default function CustomCommands() {
               </button>
             </div>
 
-            <div class="modal-body-edit">
-              <div class="form-group">
-                <label class="form-label">User Request</label>
+            <div class="custom-modal-body-edit">
+              <div class="custom-form-group">
+                <label class="custom-form-label">User Request</label>
                 <textarea
-                  class="form-textarea"
+                  class="custom-form-textarea"
                   value={editFormData().userRequest}
                   onInput={(e) =>
                     setEditFormData((prev) => ({
@@ -228,10 +281,10 @@ export default function CustomCommands() {
                 />
               </div>
 
-              <div class="form-group">
-                <label class="form-label">BMO Response</label>
+              <div class="custom-form-group">
+                <label class="custom-form-label">BMO Response</label>
                 <textarea
-                  class="form-textarea"
+                  class="custom-form-textarea"
                   value={editFormData().bmoResponse}
                   onInput={(e) =>
                     setEditFormData((prev) => ({
@@ -245,15 +298,78 @@ export default function CustomCommands() {
               </div>
             </div>
 
-            <div class="modal-footer-edit">
-              <button class="btn btn-secondary" onClick={closeEditModal} disabled={isSaving()}>
+            <div class="custom-modal-footer-edit">
+              <button class="custom-btn custom-btn-secondary" onClick={closeEditModal} disabled={isSaving()}>
                 Cancel
               </button>
-              <button class="btn btn-primary" onClick={saveEdit} disabled={isSaving()}>
+              <button class="custom-btn custom-btn-primary" onClick={saveEdit} disabled={isSaving()}>
                 <Show when={isSaving()}>
-                  <div class="btn-spinner"></div>
+                  <div class="custom-btn-spinner"></div>
                 </Show>
                 {isSaving() ? "Saving..." : "Save Changes"}
+              </button>
+            </div>
+          </div>
+        </div>
+      </Show>
+
+      {/* Add Modal */}
+      <Show when={showAddModal()}>
+        <div class="custom-modal-overlay-edit" onClick={closeAddModal}>
+          <div class="custom-modal-content-edit" onClick={(e) => e.stopPropagation()}>
+            <div class="custom-modal-header-edit">
+              <h3>Add New Entry</h3>
+              <button class="custom-modal-close-btn-edit" onClick={closeAddModal}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+
+            <div class="custom-modal-body-edit">
+              <div class="custom-form-group">
+                <label class="custom-form-label">User Request</label>
+                <textarea
+                  class="custom-form-textarea"
+                  value={addFormData().userRequest}
+                  onInput={(e) =>
+                    setAddFormData((prev) => ({
+                      ...prev,
+                      userRequest: e.target.value
+                    }))
+                  }
+                  rows="4"
+                  placeholder="Enter user request..."
+                />
+              </div>
+
+              <div class="custom-form-group">
+                <label class="custom-form-label">BMO Response</label>
+                <textarea
+                  class="custom-form-textarea"
+                  value={addFormData().bmoResponse}
+                  onInput={(e) =>
+                    setAddFormData((prev) => ({
+                      ...prev,
+                      bmoResponse: e.target.value
+                    }))
+                  }
+                  rows="4"
+                  placeholder="Enter BMO response..."
+                />
+              </div>
+            </div>
+
+            <div class="custom-modal-footer-edit">
+              <button class="custom-btn custom-btn-secondary" onClick={closeAddModal} disabled={isAdding()}>
+                Cancel
+              </button>
+              <button class="custom-btn custom-btn-primary" onClick={saveNewEntry} disabled={isAdding()}>
+                <Show when={isAdding()}>
+                  <div class="custom-btn-spinner"></div>
+                </Show>
+                {isAdding() ? "Adding..." : "Add Entry"}
               </button>
             </div>
           </div>
