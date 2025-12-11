@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 
 import History from "./History.js";
-import CustomCommand from "./CustomCommand.js";
+import CustomCommand from "./Commands.js";
 
 dotenv.config();
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
