@@ -250,7 +250,6 @@ export default function CustomCommands() {
         </Show>
       </div>
 
-      {/* Edit Modal */}
       <Show when={editingRow()}>
         <div class="custom-modal-overlay-edit" onClick={closeEditModal}>
           <div class="custom-modal-content-edit" onClick={(e) => e.stopPropagation()}>
@@ -313,7 +312,6 @@ export default function CustomCommands() {
         </div>
       </Show>
 
-      {/* Add Modal */}
       <Show when={showAddModal()}>
         <div class="custom-modal-overlay-edit" onClick={closeAddModal}>
           <div class="custom-modal-content-edit" onClick={(e) => e.stopPropagation()}>
