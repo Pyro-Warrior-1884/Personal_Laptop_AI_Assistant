@@ -295,6 +295,7 @@ export default function CustomCommands() {
                 <label class="custom-form-label">User Request</label>
                 <textarea
                   class="custom-form-textarea"
+                  placeholder="Enter User Input"
                   value={addFormData().userRequest}
                   onInput={(e) =>
                     setAddFormData((prev) => ({
@@ -310,6 +311,7 @@ export default function CustomCommands() {
                 <label class="custom-form-label">BMO Response</label>
                 <textarea
                   class="custom-form-textarea"
+                  placeholder="Enter BMO Response"
                   value={addFormData().bmoResponse}
                   onInput={(e) =>
                     setAddFormData((prev) => ({

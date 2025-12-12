@@ -8,6 +8,7 @@ import {
   DELETE_COMMAND
 } from "../graphql/queries";
 import { parseCustomDate } from "./useHistory";
+import dayjs from "dayjs";
 
 export function useCustomCommandsController() {
   const [timestamps, setTimestamps] = createSignal([]);
@@ -211,12 +212,18 @@ export function useCustomCommandsController() {
   };
 
   const saveNewEntry = async () => {
-    if (!addFormData().userRequest.trim() || !addFormData().bmoResponse.trim()) return;
+    const user = addFormData().userRequest.trim();
+    const bmo = addFormData().bmoResponse.trim();
+
+    if (!user || !bmo) {
+      alert("Please enter both User Request and BMO Response.");
+      return;
+    }
 
     setIsAdding(true);
     try {
-      const timestamp = new Date().toLocaleString("en-GB").replace(",", "");
-      await addCommand(timestamp, addFormData().userRequest, addFormData().bmoResponse);
+      const timestamp = dayjs().format("DD-MM-YYYY HH:mm:ss");
+      await addCommand(timestamp, user, bmo);
       closeAddModal();
     } finally {
       setIsAdding(false);
