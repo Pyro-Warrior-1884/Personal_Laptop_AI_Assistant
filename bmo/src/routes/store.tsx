@@ -4,9 +4,11 @@ import "./store.css";
 import CurrentView from "../chat/CurrentView";
 import HistoryView from "../chat/HistoryView";
 import CustomCommands from "../chat/CustomCommands"; 
+import EmailLogs from "../chat/EmailLogs";
 import { useHistoryController } from "../chat/useHistory";
 
-type Tab = "current" | "history" | "commands"; 
+
+type Tab = "current" | "history" | "commands" | "email"; 
 
 export default function Store() {
   const [activeTab, setActiveTab] = createSignal<Tab>("current");
@@ -54,6 +56,13 @@ export default function Store() {
           >
             Custom Commands
           </button>
+
+          <button
+            class={`tab-button ${activeTab() === "email" ? "active" : ""}`}
+            onClick={() => switchTab("email")}
+          >
+            Email Auth
+          </button>
         </div>
 
         <div class="tab-content">
@@ -61,8 +70,10 @@ export default function Store() {
             <CurrentView latest={latest()} />
           ) : activeTab() === "history" ? (
             <HistoryView />
-          ) : (
+          ) : activeTab() === "commands" ? (
             <CustomCommands /> 
+          ) : (
+            <EmailLogs />
           )}
         </div>
       </div>
