@@ -6,7 +6,7 @@ export async function sendEmailRequest(email: string) {
       }
     `;
 
-    const res = await fetch("http://localhost:4000/graphql", {
+    const res = await fetch("https://personal-laptop-ai-assistant.onrender.com/graphql", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

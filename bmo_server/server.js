@@ -32,6 +32,11 @@ const typeDefs = `
     bmo_response: String
   }
 
+  type Email {
+    timestamp: String
+    email_address: String
+  }
+
   type Query {
     getHistory: [History]
     getHistoryByTimestamp(timestamp: String!): History
@@ -39,6 +44,8 @@ const typeDefs = `
 
     getCommands: [CustomCommand]
     getCommandByTimestamp(timestamp: String!): CustomCommand
+
+    getEmails: [Email]
   }
 
   type Mutation {
@@ -77,6 +84,12 @@ const resolvers = {
     },
     getCommandByTimestamp: async (_, args) => {
       return CustomCommand.findOne({ timestamp: args.timestamp }).lean();
+    },
+
+    getEmails: async () => {
+      const docs = await Email.find().lean();
+      docs.sort((a, b) => parseDate(b.timestamp) - parseDate(a.timestamp));
+      return docs;
     }
   },
 
@@ -146,7 +159,8 @@ const resolvers = {
         await Email.create({ timestamp, email_address: args.email });
 
         return true;
-      } catch {
+      } catch (err) {
+        console.error("Error sending email:", err);
         return false;
       }
     }

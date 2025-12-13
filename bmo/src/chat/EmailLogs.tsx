@@ -7,7 +7,6 @@ export default function EmailLogs() {
     loadingRows,
     sortOrder,
     dateFilter,
-    isInitialLoading,
     setDateFilter,
     filteredAndSortedData,
     toggleSortOrder,
