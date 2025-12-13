@@ -116,3 +116,11 @@ export const DELETE_COMMAND = gql`
   }
 `;
 
+export const GET_EMAILS = gql`
+  query {
+    getEmails {
+      timestamp
+      email_address
+    }
+  }
+`;

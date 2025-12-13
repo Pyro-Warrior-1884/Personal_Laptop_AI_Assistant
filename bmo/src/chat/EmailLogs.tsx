@@ -1,18 +1,15 @@
-import { For, Show} from "solid-js";
-import { useCustomCommandsController } from "./useCustomCommandsController";
+import { For, Show } from "solid-js";
+import { useEmailLogsController } from "./useEmailController";
 
 export default function EmailLogs() {
   const {
-    expandedRows,
-    loadingRows,
+    isInitialLoading,
     sortOrder,
     dateFilter,
     setDateFilter,
     filteredAndSortedData,
-    toggleSortOrder,
-    handleRowClick,
-  } = useCustomCommandsController();
-
+    toggleSortOrder
+  } = useEmailLogsController();
 
   return (
     <div class="email-container">
@@ -82,48 +79,12 @@ export default function EmailLogs() {
               </thead>
               <tbody>
                 <For each={filteredAndSortedData()}>
-                  {(item) => {
-                    const rowData = () => expandedRows().get(item.timestamp);
-                    const isLoading = () => loadingRows().has(item.timestamp);
-                    const isExpanded = () => expandedRows().has(item.timestamp);
-
-                    return (
-                      <tr class="email-table-row" classList={{ expanded: isExpanded() }}>
-                        <td class="email-table-cell email-datetime-cell">{item.timestamp}</td>
-
-                        <td
-                          class="email-table-cell email-email-cell email-clickable-cell"
-                          classList={{ expanded: isExpanded(), loading: isLoading() }}
-                          onClick={() => handleRowClick(item.timestamp)}
-                        >
-                          <Show
-                            when={!isLoading()}
-                            fallback={
-                              <div class="email-cell-loading">
-                                <div class="email-mini-spinner"></div>
-                                <span>Loading...</span>
-                              </div>
-                            }
-                          >
-                            <Show
-                              when={isExpanded()}
-                              fallback={
-                                <div class="email-hidden-content">
-                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                                    <circle cx="12" cy="12" r="3" />
-                                  </svg>
-                                  <span>Click to reveal</span>
-                                </div>
-                              }
-                            >
-                              {rowData()?.userRequest || "N/A"}
-                            </Show>
-                          </Show>
-                        </td>
-                      </tr>
-                    );
-                  }}
+                  {(item) => (
+                    <tr class="email-table-row">
+                      <td class="email-table-cell email-datetime-cell">{item.timestamp}</td>
+                      <td class="email-table-cell email-email-cell">{item.email_address}</td>
+                    </tr>
+                  )}
                 </For>
               </tbody>
             </table>
