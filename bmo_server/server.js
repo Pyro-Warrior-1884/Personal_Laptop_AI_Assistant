@@ -3,9 +3,11 @@ import { startStandaloneServer } from "@apollo/server/standalone";
 import sgMail from "@sendgrid/mail";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
+import dayjs from "dayjs";
 
 import History from "./History.js";
 import CustomCommand from "./Commands.js";
+import Email from "./Email.js";
 
 dotenv.config();
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
@@ -139,6 +141,10 @@ const resolvers = {
         };
 
         await sgMail.send(msg);
+
+        const timestamp = dayjs().format("DD-MM-YYYY HH:mm:ss");
+        await Email.create({ timestamp, email_address: args.email });
+
         return true;
       } catch {
         return false;
