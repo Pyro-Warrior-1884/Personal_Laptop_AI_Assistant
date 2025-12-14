@@ -1,0 +1,5 @@
+{
+  "scripts": {
+    "dev": "concurrently \"cd bmo && npm run dev\" \"cd bmo_server && node server.js\""
+  }
+}
