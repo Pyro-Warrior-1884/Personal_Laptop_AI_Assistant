@@ -177,12 +177,15 @@ def main_loop():
             if buffer and (time.time() - last_input_time > 5):
                 prompt = " ".join(buffer).strip().lower()
                 buffer.clear()
+                last_input_time = time.time()
                 if not prompt:
                     drain_text_queue()
+                    last_input_time = time.time()
                     last_sent_prompt = None
                 else:
                     if prompt == last_sent_prompt:
                         drain_text_queue()
+                        last_input_time = time.time()
                         last_sent_prompt = None
                     else:
                         print(f"Albert Request: {prompt}")
@@ -198,12 +201,12 @@ def main_loop():
                             respond("Saved sir. I'll remember that.")
                             print(f"Custom Command Added: '{pending_request}': '{prompt}'")
                             creating_mode = False
-                            pending_request = None
                             
                             exchange = {
                                 "albert": {"message": f"Albert Request: create (created '{pending_request}')"},
                                 "bmo": {"message": f"BMO response: Saved custom command.", "timestamp": datetime.utcnow().strftime("%d-%m-%Y %H:%M:%S")}
                             }
+                            pending_request = None
                             conversation_buffer.append(exchange)
                             continue
 
@@ -212,6 +215,16 @@ def main_loop():
                             pending_request = None
                             respond("What is the request, sir?")
                             continue
+
+                        if prompt == "write" or prompt == "right":
+                            respond("Typing mode enabled, sir. Please type your message.")
+                            print("Typing mode (press Enter to submit):")
+                            typed_prompt = input("> ").strip().lower()
+                            if not typed_prompt:
+                                respond("No input received, sir.")
+                                continue
+                            prompt = typed_prompt
+                            print(f"Albert Typed: {prompt}")                     
 
                         with custom_lock:
                             if prompt in custom_commands:
@@ -308,6 +321,7 @@ def main_loop():
                         last_sent_prompt = prompt
                         drain_text_queue()
                         last_sent_prompt = None
+                        last_input_time = time.time()
                         exchange = {
                             "albert": {"message": f"Albert Request: {prompt}"},
                             "bmo": {"message": bmo_response, "timestamp": datetime.utcnow().strftime("%d-%m-%Y %H:%M:%S")}
