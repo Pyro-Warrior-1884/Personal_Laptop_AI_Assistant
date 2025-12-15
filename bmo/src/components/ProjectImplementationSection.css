@@ -28,3 +28,20 @@
         font-size: 1rem;
     }
 }
+
+.section-subtitle {
+  margin-top: 1.2rem;
+  margin-bottom: 0.4rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.section-list {
+  margin-left: 1.2rem;
+  margin-top: 0.4rem;
+}
+
+.section-list li {
+  margin-bottom: 0.35rem;
+  line-height: 1.6;
+}
